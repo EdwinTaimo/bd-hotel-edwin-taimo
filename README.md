@@ -1,104 +1,64 @@
-# Base de Dados — Gestão de Hotel
+# Sistema de Gestão Hoteleira - Base de Dados
 
-**Autor:** Edwin Taimo 
-**Curso:** Licenciatura em Informática, 2.º ano — Universidade Licungo  
-**Disciplina:** Tecnologias de Base de Dados  
-**Trabalho II:** Projeto de uma Base de Dados  
-**Tema:** Hotel  
-
-
-> **Vídeo de apresentação:** [COLAR AQUI O LINK DO YOUTUBE]
+**Estudante:** Edwin Jerry Joaquim Taimo Gema
+**Curso:** Licenciatura em Informática (2º Ano)
+**Disciplina:** Tecnologias de Base de Dados
+**Instituição:** Universidade Licungo
+**Tema:** Gestão Hoteleira (Hotel)
+**Link do Vídeo:** [Link para o Vídeo no YouTube - Não Listado]
 
 ---
 
-## 1. Descrição do problema
+## 1. Descrição do Problema e Âmbito do Sistema Web
 
-Um hotel de média dimensão gere hoje as reservas, os hóspedes e os pagamentos em cadernos e folhas de cálculo soltas. Isto causa problemas frequentes: reservas duplicadas para o mesmo quarto e as mesmas datas, perda do histórico dos hóspedes, dificuldade em saber quais quartos estão livres e valores de contas calculados à mão, com erros.
+O setor de hotelaria enfrenta desafios na organização de quartos, gestão de reservas de hóspedes, alocação de serviços adicionais (como restauração e limpeza) e processamento de pagamentos.
 
-Esta base de dados centraliza a informação do hotel. O rececionista regista o hóspede, escolhe um quarto de determinado tipo e cria a reserva com as datas de entrada e saída. Durante a estadia, os serviços extra consumidos (refeições, lavandaria, transfer, spa, etc.) ficam associados à reserva. O hóspede paga em um ou mais pagamentos (por exemplo, sinal na reserva e liquidação no check-out) por numerário, cartão, M-Pesa, e-Mola ou transferência. A partir destes dados é possível consultar a ocupação, o histórico de cada hóspede e o valor total de cada conta.
+Este projeto visa conceber a base de dados relacional para um **Sistema Web de Gestão Hoteleira**. O sistema permitirá aos utilizadores (hóspedes, rececionistas e administradores):
 
-## 2. Regras de negócio
+- Efetuar o registo de hóspedes e gestão de perfis;
+- Consultar a disponibilidade de quartos por categoria (Solteiro, Casal, Suíte Presidencial);
+- Realizar e gerir reservas em tempo real;
+- Registar consumos de serviços adicionais associados à estadia;
+- Processar pagamentos e emissão de faturas na caixa da receção.
 
-1. Um hóspede é identificado de forma única pelo seu documento (BI ou passaporte).
-2. Cada quarto pertence a exatamente um tipo de quarto; o tipo define a capacidade e o preço por noite.
-3. O número do quarto é único no hotel.
-4. O estado de um quarto é um de: *Disponível*, *Ocupado* ou *Manutenção*.
-5. Uma reserva é feita por um hóspede, para um quarto, e é registada por um funcionário (rececionista).
-6. A data de check-out tem de ser posterior à data de check-in.
-7. O número de hóspedes de uma reserva não pode exceder a capacidade do tipo de quarto.
-8. O estado de uma reserva é um de: *Confirmada*, *Em curso*, *Concluída* ou *Cancelada*.
-9. Os serviços extra consumidos são associados à reserva; o preço cobrado fica guardado no momento do consumo.
-10. Um pagamento só existe associado a uma reserva (entidade fraca) e cada reserva pode ter vários pagamentos, numerados em sequência.
-11. O total de uma reserva é calculado: noites × preço da noite + serviços consumidos.
-12. Não é permitido eliminar registos que tenham dependentes (ex.: uma reserva com pagamentos).
+---
 
-## 3. Sistema web previsto
+## 2. Regras de Negócio
 
-Na disciplina de Programação Web será desenvolvido um sistema web de gestão do hotel sobre esta base de dados.
+1. **Hóspedes:** Um hóspede deve ser identificado de forma única por um BI/Passaporte e ter dados de contacto válidos.
+2. **Quartos:** Cada quarto possui um número único, um andar, um preço por noite e pertence obrigatoriamente a uma **Categoria**.
+3. **Reservas:**
+   - Um hóspede pode realizar várias reservas, mas cada reserva pertence a um único hóspede.
+   - Uma reserva deve ter uma data de check-in e check-out bem definidas, onde `data_checkout > data_checkin`.
+   - O estado da reserva pode variar entre: 'Pendente', 'Confirmada', 'Cancelada' ou 'Concluída'.
+4. **Serviços Adicionais:**
+   - Podem ser associados consumos extras (ex.: Restaurante, Lavandaria, Bar) a uma reserva ativa.
+5. **Pagamentos:**
+   - Cada reserva associada gera um registo de pagamento com o valor total calculado (dias de permanência × preço diário + consumos extra) e forma de pagamento ('Numerário', 'Cartão', 'M-Pesa').
 
-- **Utilizadores:** rececionistas (operação diária), gerente (relatórios e gestão) e, numa fase seguinte, hóspedes (consulta e pedido de reservas).
-- **Funcionalidades previstas:**
-  - registar, listar, pesquisar, alterar e eliminar hóspedes;
-  - consultar quartos disponíveis por datas e tipo;
-  - criar, alterar e cancelar reservas; fazer check-in e check-out;
-  - registar consumo de serviços e pagamentos;
-  - emitir a conta final de cada reserva;
-  - relatórios: ocupação por período, receitas e serviços mais consumidos.
+---
 
-## 4. Modelo de dados
+## 3. Diagrama Entidade-Relacionamento (Conceito ER)
 
-### Diagrama Entidade-Relacionamento
+### Entidades e Atributos:
 
-![Diagrama ER](diagrama_er.png)
+- **Hospede** (`id_hospede`, nome, email, telefone, documento_id)
+- **CategoriaQuarto** (`id_categoria`, nome_categoria, descricao)
+- **Quarto** (`id_quarto`, numero_quarto, andar, preco_diaria, estado, `id_categoria`)
+- **Reserva** (`id_reserva`, `id_hospede`, `id_quarto`, data_checkin, data_checkout, valor_total, estado_reserva)
+- **Servico** (`id_servico`, nome_servico, preco)
+- **ConsumoServico** (`id_consumo`, `id_reserva`, `id_servico`, data_consumo, quantidade)
+- **Pagamento** (`id_pagamento`, `id_reserva`, data_pagamento, valor_pago, metodo_pagamento)
 
-### Entidades
+---
 
-| Entidade | Descrição |
-|---|---|
-| HOSPEDE | Pessoa que se hospeda no hotel |
-| FUNCIONARIO | Trabalhador do hotel (rececionista, camareira, etc.) |
-| TIPO_QUARTO | Categoria de quarto com capacidade e preço por noite |
-| QUARTO | Quarto físico do hotel |
-| RESERVA | Reserva de um quarto por um hóspede |
-| SERVICO | Serviço extra oferecido (refeições, spa, transfer...) |
-| CONSUMO_SERVICO | Tabela associativa entre reserva e serviço (N:M) |
-| PAGAMENTO | **Entidade fraca**: pagamentos de uma reserva |
+## 4. Roteiro para Apresentação do Vídeo (8 a 12 Minutos)
 
-O modelo relacional completo, com chaves, cardinalidades e participação, está em [`modelo_relacional.md`](modelo_relacional.md).
+Conforme os requisitos da avaliação, a demonstração em vídeo deve seguir os tópicos:
 
-## 5. Estrutura do repositório
-
-```
-bd-hotel-edwin-apelido/
-  README.md
-  diagrama_er.png
-  modelo_relacional.md
-  01_criacao_e_insercao.sql
-  02_manipulacao.sql
-```
-
-## 6. Como executar
-
-1. Instalar o MySQL (ou MariaDB) e abrir um terminal ou o MySQL Workbench.
-2. Criar a base de dados, as tabelas e inserir os registos (mínimo de 20 por tabela):
-   ```bash
-   mysql -u root -p < 01_criacao_e_insercao.sql
-   ```
-3. Executar os comandos de manipulação (SELECT, JOIN, UPDATE, DELETE e teste de integridade):
-   ```bash
-   mysql -u root -p hotel_db < 02_manipulacao.sql
-   ```
-   O último comando do ficheiro (secção E) falha **de propósito**, para demonstrar a integridade referencial.
-
-### Registos inseridos
-
-| Tabela | Registos |
-|---|---|
-| hospede | 25 |
-| funcionario | 20 |
-| tipo_quarto | 20 |
-| servico | 20 |
-| quarto | 25 |
-| reserva | 25 |
-| consumo_servico | 32 |
-| pagamento | 33 |
+1. **Apresentação (1 min):** Introdução pessoal, apresentação do tema (Hotel) e do propósito do sistema web.
+2. **Processo de Conceção (2-3 min):** Identificação de entidades, atributos, relacionamentos e regras de negócio.
+3. **Diagramas (2 min):** Explicação das cardinalidades, chaves primárias e estrangeiras.
+4. **Criação da Base de Dados (2 min):** Execução do script `01_criacao_e_insercao.sql` e visualização das tabelas preenchidas no SGBD.
+5. **Execução dos Comandos (3-4 min):** Execução passo a passo dos comandos do ficheiro `02_manipulacao.sql`. *(Nota: Explicar o resultado esperado antes de cada execução)*.
+6. **Conclusão (1 min):** Desafios enfrentados durante a modelação e aprendizagens obtidas.
